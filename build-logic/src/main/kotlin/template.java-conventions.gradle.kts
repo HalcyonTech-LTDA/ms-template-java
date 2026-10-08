@@ -17,7 +17,8 @@ tasks.withType<JavaCompile>().configureEach {
         listOf(
             "-parameters",
             "-Xlint:all",
-            "-Xlint:-processing"
+            "-Xlint:-processing",
+            "-Xlint:-serial"
         )
     )
 }
@@ -70,3 +71,32 @@ configurations.named("integrationTestImplementation") {
 configurations.named("integrationTestRuntimeOnly") {
     extendsFrom(configurations.testRuntimeOnly.get())
 }
+
+val mockitoAgent: Configuration = configurations.create("mockitoAgent") {
+    isCanBeConsumed = false
+    isCanBeResolved = true
+}
+
+dependencies {
+    "mockitoAgent"(platform(libs.findLibrary("spring-boot-bom").get()))
+    "mockitoAgent"("org.mockito:mockito-core") {
+        isTransitive = false
+    }
+}
+
+tasks.withType<Test>().configureEach {
+    jvmArgs("-Xshare:off")
+    jvmArgumentProviders.add(MockitoAgentProvider(mockitoAgent))
+}
+
+class MockitoAgentProvider(
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.NONE)
+    val agentFiles: FileCollection
+) : CommandLineArgumentProvider {
+    override fun asArguments(): Iterable<String> {
+        val jar = agentFiles.singleOrNull()
+        return if (jar != null) listOf("-javaagent:${jar.absolutePath}") else emptyList()
+    }
+}
+
