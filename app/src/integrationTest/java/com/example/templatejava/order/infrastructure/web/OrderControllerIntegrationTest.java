@@ -64,4 +64,34 @@ class OrderControllerIntegrationTest extends AbstractIntegrationTest {
         assertThat(fetchedOrder.amount()).isEqualByComparingTo("199.99");
         assertThat(fetchedOrder.status()).isEqualTo("CREATED");
     }
+
+    @Test
+    @DisplayName("should return 400 Bad Request when request body is malformed")
+    void shouldReturn400WhenRequestBodyIsMalformed() {
+        given().contentType(ContentType.JSON)
+                .body("{ invalid_json }")
+                .when()
+                .post("/orders")
+                .then()
+                .statusCode(400);
+    }
+
+    @Test
+    @DisplayName("should return 404 Not Found when order does not exist")
+    void shouldReturn404WhenOrderDoesNotExist() {
+        given().noContentType().when().get("/orders/non-existent-id").then().statusCode(404);
+    }
+
+    @Test
+    @DisplayName("should return 422 Unprocessable Entity when order data is invalid")
+    void shouldReturn422WhenOrderDataIsInvalid() {
+        var request = new CreateOrderRequest("valid-customer-id", new BigDecimal("-10.00"));
+
+        given().contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post("/orders")
+                .then()
+                .statusCode(422);
+    }
 }
