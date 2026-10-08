@@ -1,5 +1,6 @@
 package com.example.templatejava.customer.infrastructure.database.adapter;
 
+import com.example.templatejava.customer.domain.exception.CustomerAlreadyExistsException;
 import com.example.templatejava.customer.domain.model.Customer;
 import com.example.templatejava.customer.domain.model.Customer.CustomerStatus;
 import com.example.templatejava.customer.domain.repository.CustomerRepository;
@@ -9,6 +10,7 @@ import com.example.templatejava.customer.infrastructure.database.repository.Spri
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import org.springframework.dao.DuplicateKeyException;
 
 public class CustomerDatabaseAdapter implements CustomerRepository {
 
@@ -30,8 +32,12 @@ public class CustomerDatabaseAdapter implements CustomerRepository {
     public Customer save(Customer customer) {
         Objects.requireNonNull(customer, "customer must not be null");
         CustomerMongoEntity entity = customerDatabaseMapper.toEntity(customer);
-        CustomerMongoEntity savedEntity = springDataRepository.save(entity);
-        return customerDatabaseMapper.toDomain(savedEntity);
+        try {
+            CustomerMongoEntity savedEntity = springDataRepository.save(entity);
+            return customerDatabaseMapper.toDomain(savedEntity);
+        } catch (DuplicateKeyException e) {
+            throw new CustomerAlreadyExistsException(customer.getEmail());
+        }
     }
 
     @Override
