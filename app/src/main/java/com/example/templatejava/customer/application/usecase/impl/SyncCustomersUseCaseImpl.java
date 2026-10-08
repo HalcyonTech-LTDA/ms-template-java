@@ -31,18 +31,22 @@ public class SyncCustomersUseCaseImpl implements SyncCustomersUseCase {
 
         int updatedCount = 0;
         for (Customer customer : pendingCustomers) {
-            CustomerBureauProviderGateway.BureauData bureauData =
-                    customerBureauProviderGateway.fetchBureauData(
-                            customer.getId(), customer.getEmail());
+            try {
+                CustomerBureauProviderGateway.BureauData bureauData =
+                        customerBureauProviderGateway.fetchBureauData(
+                                customer.getId(), customer.getEmail());
 
-            CustomerStatus newStatus =
-                    "APPROVED".equalsIgnoreCase(bureauData.status())
-                            ? CustomerStatus.ACTIVE
-                            : CustomerStatus.SUSPENDED;
+                CustomerStatus newStatus =
+                        "APPROVED".equalsIgnoreCase(bureauData.status())
+                                ? CustomerStatus.ACTIVE
+                                : CustomerStatus.SUSPENDED;
 
-            customer.enrichWithBureauData(bureauData.score(), newStatus);
-            customerRepository.save(customer);
-            updatedCount++;
+                customer.enrichWithBureauData(bureauData.score(), newStatus);
+                customerRepository.save(customer);
+                updatedCount++;
+            } catch (Exception e) {
+                // Ignore exception to process the remaining customers
+            }
         }
 
         return updatedCount;
