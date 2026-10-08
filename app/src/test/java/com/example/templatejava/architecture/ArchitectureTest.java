@@ -118,9 +118,7 @@ public class ArchitectureTest {
                     .and()
                     .areInterfaces()
                     .and()
-                    .doNotHaveSimpleName("SpringDataCustomerRepository")
-                    .and()
-                    .doNotHaveSimpleName("SpringDataOrderRepository")
+                    .resideOutsideOfPackage("..infrastructure.database.repository..")
                     .should()
                     .resideInAPackage("..domain.repository..");
 
