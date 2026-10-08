@@ -108,6 +108,20 @@ app:
     bureau:
       url: ${BUREAU_SERVICE_URL}
 
+resilience4j:
+  circuitbreaker:
+    instances:
+      bureau:
+        slidingWindowSize: 10
+        permittedNumberOfCallsInHalfOpenState: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10000
+  retry:
+    instances:
+      bureau:
+        maxAttempts: 3
+        waitDuration: 500
+
 ---
 
 spring:

@@ -21,6 +21,7 @@ dependencies {
     implementation(libs.spring.boot.starter.data.mongodb)
     implementation(libs.spring.boot.starter.opentelemetry)
     implementation(libs.spring.cloud.starter.openfeign)
+    implementation(libs.spring.cloud.starter.circuitbreaker.resilience4j)
     implementation(libs.springdoc.openapi)
     implementation(libs.apache.commons.lang3)
     implementation(libs.apache.commons.collections4)
