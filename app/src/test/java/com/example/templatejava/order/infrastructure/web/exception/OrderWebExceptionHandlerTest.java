@@ -1,29 +1,27 @@
 package com.example.templatejava.order.infrastructure.web.exception;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import com.example.templatejava.common.infrastructure.web.response.ErrorResponse;
 import com.example.templatejava.order.domain.exception.CustomerNotEligibleException;
 import com.example.templatejava.order.domain.exception.InvalidOrderException;
 import com.example.templatejava.order.domain.exception.OrderNotFoundException;
-import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
 
 class OrderWebExceptionHandlerTest {
 
     private OrderWebExceptionHandler handler;
-    private HttpServletRequest request;
+    private MockHttpServletRequest request;
 
     @BeforeEach
     void setUp() {
         handler = new OrderWebExceptionHandler();
-        request = mock(HttpServletRequest.class);
-        when(request.getRequestURI()).thenReturn("/orders");
+        request = new MockHttpServletRequest();
+        request.setRequestURI("/orders");
     }
 
     @Test

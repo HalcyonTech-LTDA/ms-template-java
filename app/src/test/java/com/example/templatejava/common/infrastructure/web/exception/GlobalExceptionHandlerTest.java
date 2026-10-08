@@ -1,26 +1,24 @@
 package com.example.templatejava.common.infrastructure.web.exception;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import com.example.templatejava.common.infrastructure.web.response.ErrorResponse;
-import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
 
 class GlobalExceptionHandlerTest {
 
     private GlobalExceptionHandler handler;
-    private HttpServletRequest request;
+    private MockHttpServletRequest request;
 
     @BeforeEach
     void setUp() {
         handler = new GlobalExceptionHandler();
-        request = mock(HttpServletRequest.class);
-        when(request.getRequestURI()).thenReturn("/api/test");
+        request = new MockHttpServletRequest();
+        request.setRequestURI("/api/test");
     }
 
     @Test
@@ -44,6 +42,6 @@ class GlobalExceptionHandlerTest {
         assertThat(response.getStatusCode().value()).isEqualTo(500);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().error()).isEqualTo("INTERNAL_SERVER_ERROR");
-        assertThat(response.getBody().message()).isEqualTo("Unexpected error");
+        assertThat(response.getBody().message()).isEqualTo("Internal Server Error");
     }
 }

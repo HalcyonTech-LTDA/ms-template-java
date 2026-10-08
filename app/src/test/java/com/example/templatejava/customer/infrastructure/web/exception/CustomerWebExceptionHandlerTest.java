@@ -1,29 +1,27 @@
 package com.example.templatejava.customer.infrastructure.web.exception;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import com.example.templatejava.common.infrastructure.web.response.ErrorResponse;
 import com.example.templatejava.customer.domain.exception.CustomerAlreadyExistsException;
 import com.example.templatejava.customer.domain.exception.CustomerNotFoundException;
 import com.example.templatejava.customer.domain.exception.InvalidCustomerException;
-import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
 
 class CustomerWebExceptionHandlerTest {
 
     private CustomerWebExceptionHandler handler;
-    private HttpServletRequest request;
+    private MockHttpServletRequest request;
 
     @BeforeEach
     void setUp() {
         handler = new CustomerWebExceptionHandler();
-        request = mock(HttpServletRequest.class);
-        when(request.getRequestURI()).thenReturn("/customers");
+        request = new MockHttpServletRequest();
+        request.setRequestURI("/customers");
     }
 
     @Test

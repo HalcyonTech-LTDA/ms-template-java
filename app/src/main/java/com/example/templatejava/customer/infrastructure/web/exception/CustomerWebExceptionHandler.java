@@ -52,10 +52,10 @@ public class CustomerWebExceptionHandler {
                 new ErrorResponse(
                         "INVALID_CUSTOMER",
                         ex.getMessage(),
-                        HttpStatus.UNPROCESSABLE_ENTITY.value(),
+                        HttpStatus.UNPROCESSABLE_CONTENT.value(),
                         Instant.now(),
                         request.getRequestURI(),
                         List.of());
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).body(response);
     }
 }

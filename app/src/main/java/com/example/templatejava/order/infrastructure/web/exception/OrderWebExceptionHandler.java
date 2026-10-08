@@ -38,11 +38,11 @@ public class OrderWebExceptionHandler {
                 new ErrorResponse(
                         "CUSTOMER_NOT_ELIGIBLE",
                         ex.getMessage(),
-                        HttpStatus.UNPROCESSABLE_ENTITY.value(),
+                        HttpStatus.UNPROCESSABLE_CONTENT.value(),
                         Instant.now(),
                         request.getRequestURI(),
                         List.of());
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).body(response);
     }
 
     @ExceptionHandler(InvalidOrderException.class)
@@ -52,10 +52,10 @@ public class OrderWebExceptionHandler {
                 new ErrorResponse(
                         "INVALID_ORDER",
                         ex.getMessage(),
-                        HttpStatus.UNPROCESSABLE_ENTITY.value(),
+                        HttpStatus.UNPROCESSABLE_CONTENT.value(),
                         Instant.now(),
                         request.getRequestURI(),
                         List.of());
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).body(response);
     }
 }
