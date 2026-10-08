@@ -65,7 +65,6 @@ management:
     health:
       show-details: never
   tracing:
-    enabled: false
     export:
       enabled: false
       otlp:
