@@ -1,0 +1,23 @@
+{
+  "name": "migrate-mongo",
+  "version": "1.0.0",
+  "description": "MongoDB migrations for ms-template-java",
+  "main": "migrate-mongo-config.js",
+  "scripts": {
+    "migrate:up": "migrate-mongo up",
+    "migrate:down": "migrate-mongo down",
+    "migrate:status": "migrate-mongo status",
+    "migrate:create": "migrate-mongo create"
+  },
+  "keywords": [
+    "mongodb",
+    "migrations",
+    "migrate-mongo"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "migrate-mongo": "^14.0.7"
+  }
+}

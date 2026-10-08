@@ -37,6 +37,25 @@ services:
     networks:
       - template-java-network
 
+  migrate-mongo:
+    build:
+      context: ./migrate-mongo
+      dockerfile: Dockerfile.migrate-mongo
+    image: ms-migrate-mongo:latest
+    container_name: migrate-mongo
+    restart: "no"
+    volumes:
+      - ./migrate-mongo/migrations:/app/migrations
+      - ./migrate-mongo/migrate-mongo-config.js:/app/migrate-mongo-config.js
+    environment:
+      - SPRING_MONGODB_URI=${SPRING_DOCKER_MONGODB_URI:-mongodb://mongodb:27017/example_db}
+      - SPRING_MONGODB_DATABASE=${SPRING_MONGODB_DATABASE:-example_db}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - template-java-network
+
   tempo:
     image: grafana/tempo:latest
     container_name: tempo

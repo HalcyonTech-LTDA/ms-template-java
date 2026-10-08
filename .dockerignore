@@ -28,6 +28,7 @@ tools
 newman
 k6
 wiremock
+migrate-mongo
 infra
 Taskfile.yaml
 docker-compose.yaml

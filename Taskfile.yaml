@@ -185,6 +185,100 @@ tasks:
     cmds:
       - docker compose stop api scheduling
 
+  "docker:migrate":
+    aliases:
+      - "docker:migrate:up"
+    desc: "Run database migrations via Docker Compose"
+    deps: [env, "infra:core"]
+    cmds:
+      - docker compose run --rm migrate-mongo up
+
+  "docker:migrate:status":
+    desc: "Check database migration status via Docker Compose"
+    deps: [env, "infra:core"]
+    cmds:
+      - docker compose run --rm migrate-mongo status
+
+  "docker:migrate:down":
+    desc: "Rollback last database migration via Docker Compose"
+    deps: [env, "infra:core"]
+    cmds:
+      - docker compose run --rm migrate-mongo down
+
+  "migrate:status":
+    aliases:
+      - "migration:status"
+      - "db:status"
+    desc: "Print status of database migrations (applied vs pending, native with Docker fallback)"
+    dotenv: [".env"]
+    deps: [env]
+    cmds:
+      - |
+        if command -v node >/dev/null 2>&1 && [ -d "migrate-mongo/node_modules" ]; then
+          echo "Node.js detected locally. Checking migration status natively..."
+          npm --prefix migrate-mongo run migrate:status
+        else
+          echo "Running migration status via Docker Compose..."
+          docker compose run --rm migrate-mongo status
+        fi
+
+  "migrate:up":
+    aliases:
+      - "migration:up"
+      - "db:migrate"
+      - "migrate"
+    desc: "Execute all pending database migrations (native with Docker fallback)"
+    dotenv: [".env"]
+    deps: [env]
+    cmds:
+      - |
+        if command -v node >/dev/null 2>&1 && [ -d "migrate-mongo/node_modules" ]; then
+          echo "Node.js detected locally. Executing migrate-mongo up natively..."
+          npm --prefix migrate-mongo run migrate:up
+        else
+          echo "Running migrations via Docker Compose..."
+          docker compose run --rm migrate-mongo up
+        fi
+
+  "migrate:down":
+    aliases:
+      - "migration:down"
+      - "db:rollback"
+      - "migrate:rollback"
+    desc: "Rollback the last applied database migration (native with Docker fallback)"
+    dotenv: [".env"]
+    deps: [env]
+    cmds:
+      - |
+        if command -v node >/dev/null 2>&1 && [ -d "migrate-mongo/node_modules" ]; then
+          echo "Node.js detected locally. Rolling back migration natively..."
+          npm --prefix migrate-mongo run migrate:down
+        else
+          echo "Rolling back migration via Docker Compose..."
+          docker compose run --rm migrate-mongo down
+        fi
+
+  "migrate:create":
+    aliases:
+      - "migration:create"
+      - "db:create:migration"
+    desc: "Create a new database migration file (e.g. task migrate:create -- add_new_collection)"
+    dotenv: [".env"]
+    deps: [env]
+    cmds:
+      - |
+        if [ -z "{{.CLI_ARGS}}" ]; then
+          echo "Error: Migration description is required. Usage: task migrate:create -- <description>"
+          exit 1
+        fi
+        if command -v node >/dev/null 2>&1 && [ -d "migrate-mongo/node_modules" ]; then
+          echo "Node.js detected locally. Creating migration script natively..."
+          npm --prefix migrate-mongo run migrate:create -- {{.CLI_ARGS}}
+        else
+          echo "Creating migration script via Docker Compose..."
+          docker compose run --rm migrate-mongo create {{.CLI_ARGS}}
+        fi
+
   env:
     desc: "Create .env from .env.example if it does not exist"
     cmds:
