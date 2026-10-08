@@ -3,6 +3,7 @@ package com.example.templatejava.customer.domain.model;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.example.templatejava.customer.domain.exception.InvalidCustomerException;
 import com.example.templatejava.customer.domain.model.Customer.CustomerStatus;
 import java.time.Instant;
 import org.junit.jupiter.api.DisplayName;
@@ -39,17 +40,17 @@ class CustomerTest {
     }
 
     @Test
-    @DisplayName("should throw IllegalArgumentException when bureau score is invalid")
+    @DisplayName("should throw InvalidCustomerException when bureau score is invalid")
     void shouldThrowWhenScoreIsInvalid() {
         Customer customer =
                 Customer.create("cust-123", "John Doe", "john.doe@example.com", Instant.now());
 
         assertThatThrownBy(() -> customer.enrichWithBureauData(-1, CustomerStatus.ACTIVE))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(InvalidCustomerException.class)
                 .hasMessage("Bureau score must be between 0 and 1000");
 
         assertThatThrownBy(() -> customer.enrichWithBureauData(1001, CustomerStatus.ACTIVE))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(InvalidCustomerException.class)
                 .hasMessage("Bureau score must be between 0 and 1000");
     }
 
@@ -71,11 +72,11 @@ class CustomerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"", "   ", "\t", "\n"})
-    @DisplayName("should throw IllegalArgumentException when name is blank")
+    @DisplayName("should throw InvalidCustomerException when name is blank")
     void shouldThrowWhenNameIsBlank(String blankName) {
         assertThatThrownBy(
                         () -> Customer.create("id", blankName, "john@example.com", Instant.now()))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(InvalidCustomerException.class)
                 .hasMessage("name must not be blank");
     }
 
@@ -89,10 +90,10 @@ class CustomerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"", "   ", "\t", "invalid-email", "test-without-at"})
-    @DisplayName("should throw IllegalArgumentException when email is invalid")
+    @DisplayName("should throw InvalidCustomerException when email is invalid")
     void shouldThrowWhenEmailIsInvalid(String invalidEmail) {
         assertThatThrownBy(() -> Customer.create("id", "John", invalidEmail, Instant.now()))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(InvalidCustomerException.class)
                 .hasMessage("Invalid email address: " + invalidEmail);
     }
 

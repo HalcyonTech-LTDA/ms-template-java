@@ -1,5 +1,6 @@
 package com.example.templatejava.order.domain.model;
 
+import com.example.templatejava.order.domain.exception.InvalidOrderException;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Objects;
@@ -52,7 +53,7 @@ public class Order {
     private static String validateCustomerId(String customerId) {
         Objects.requireNonNull(customerId, "customerId must not be null");
         if (customerId.isBlank()) {
-            throw new IllegalArgumentException("customerId must not be blank");
+            throw new InvalidOrderException("customerId must not be blank");
         }
         return customerId;
     }
@@ -60,7 +61,7 @@ public class Order {
     private static BigDecimal validateAmount(BigDecimal amount) {
         Objects.requireNonNull(amount, "amount must not be null");
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("amount must be greater than zero");
+            throw new InvalidOrderException("amount must be greater than zero");
         }
         return amount;
     }

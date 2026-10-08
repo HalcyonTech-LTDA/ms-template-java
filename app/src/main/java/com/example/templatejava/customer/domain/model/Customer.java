@@ -1,5 +1,6 @@
 package com.example.templatejava.customer.domain.model;
 
+import com.example.templatejava.customer.domain.exception.InvalidCustomerException;
 import java.time.Instant;
 import java.util.Objects;
 
@@ -40,7 +41,7 @@ public class Customer {
 
     public void enrichWithBureauData(int score, CustomerStatus newStatus) {
         if (score < 0 || score > 1000) {
-            throw new IllegalArgumentException("Bureau score must be between 0 and 1000");
+            throw new InvalidCustomerException("Bureau score must be between 0 and 1000");
         }
         this.bureauScore = score;
         this.status = Objects.requireNonNull(newStatus, "newStatus must not be null");
@@ -49,7 +50,7 @@ public class Customer {
     private static String validateName(String name) {
         Objects.requireNonNull(name, "name must not be null");
         if (name.isBlank()) {
-            throw new IllegalArgumentException("name must not be blank");
+            throw new InvalidCustomerException("name must not be blank");
         }
         return name;
     }
@@ -57,7 +58,7 @@ public class Customer {
     private static String validateEmail(String email) {
         Objects.requireNonNull(email, "email must not be null");
         if (email.isBlank() || !email.contains("@")) {
-            throw new IllegalArgumentException("Invalid email address: " + email);
+            throw new InvalidCustomerException("Invalid email address: " + email);
         }
         return email;
     }

@@ -3,6 +3,7 @@ package com.example.templatejava.order.domain.model;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.example.templatejava.order.domain.exception.InvalidOrderException;
 import com.example.templatejava.order.domain.model.Order.OrderStatus;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -84,7 +85,7 @@ class OrderTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"", "   ", "\t"})
-    @DisplayName("should throw IllegalArgumentException when customerId is blank")
+    @DisplayName("should throw InvalidOrderException when customerId is blank")
     void shouldThrowWhenCustomerIdIsBlank(String blankCustomerId) {
         assertThatThrownBy(
                         () ->
@@ -93,7 +94,7 @@ class OrderTest {
                                         blankCustomerId,
                                         new BigDecimal("50.00"),
                                         Instant.now()))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(InvalidOrderException.class)
                 .hasMessage("customerId must not be blank");
     }
 
@@ -106,17 +107,17 @@ class OrderTest {
     }
 
     @Test
-    @DisplayName("should throw IllegalArgumentException when amount is zero or negative")
+    @DisplayName("should throw InvalidOrderException when amount is zero or negative")
     void shouldThrowWhenAmountIsZeroOrNegative() {
         assertThatThrownBy(() -> Order.create("ord-1", "cust-1", BigDecimal.ZERO, Instant.now()))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(InvalidOrderException.class)
                 .hasMessage("amount must be greater than zero");
 
         assertThatThrownBy(
                         () ->
                                 Order.create(
                                         "ord-1", "cust-1", new BigDecimal("-10.00"), Instant.now()))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(InvalidOrderException.class)
                 .hasMessage("amount must be greater than zero");
     }
 }
