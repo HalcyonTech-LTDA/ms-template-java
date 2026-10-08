@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.scheduling.concurrent.SimpleAsyncTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
 @Configuration(proxyBeanMethods = false)
@@ -20,17 +20,8 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 @Profile("scheduling")
 public class SchedulingConfig implements SchedulingConfigurer {
 
-    @Value("${app.scheduling.thread-pool.pool-size}")
-    private int poolSize;
-
-    @Value("${app.scheduling.thread-pool.thread-name-prefix}")
+    @Value("${app.scheduling.thread-pool.thread-name-prefix:scheduling-worker-}")
     private String threadNamePrefix;
-
-    @Value("${app.scheduling.thread-pool.wait-for-tasks-to-complete-on-shutdown}")
-    private boolean waitForTasksToCompleteOnShutdown;
-
-    @Value("${app.scheduling.thread-pool.await-termination-seconds}")
-    private int awaitTerminationSeconds;
 
     @Bean
     public LockProvider lockProvider(
@@ -40,13 +31,9 @@ public class SchedulingConfig implements SchedulingConfigurer {
 
     @Bean(name = "taskScheduler")
     public TaskScheduler taskScheduler() {
-        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-        scheduler.setPoolSize(poolSize);
+        SimpleAsyncTaskScheduler scheduler = new SimpleAsyncTaskScheduler();
+        scheduler.setVirtualThreads(true);
         scheduler.setThreadNamePrefix(threadNamePrefix);
-        scheduler.setWaitForTasksToCompleteOnShutdown(waitForTasksToCompleteOnShutdown);
-        scheduler.setAwaitTerminationSeconds(awaitTerminationSeconds);
-        scheduler.setRemoveOnCancelPolicy(true);
-        scheduler.initialize();
         return scheduler;
     }
 

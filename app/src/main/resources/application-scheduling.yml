@@ -7,11 +7,6 @@ app:
     shedlock:
       defaults:
         lock-at-most-for: ${SHEDLOCK_LOCK_AT_MOST_FOR}
-    thread-pool:
-      pool-size: ${APP_SCHEDULING_POOL_SIZE}
-      thread-name-prefix: ${APP_SCHEDULING_THREAD_NAME_PREFIX}
-      wait-for-tasks-to-complete-on-shutdown: ${APP_SCHEDULING_WAIT_FOR_TASKS_ON_SHUTDOWN}
-      await-termination-seconds: ${APP_SCHEDULING_AWAIT_TERMINATION_SECONDS}
 
 ---
 
