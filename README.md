@@ -1,112 +1,112 @@
 # 🚀 Golden Path Project Template (Java & Spring Boot)
 
-Bem-vindo ao **Golden Path Project Template** (`ms-template-java`). Este repositório serve como a base técnica oficial e o modelo arquitetural para o desenvolvimento de novos microsserviços na organização. Ele engloba as melhores práticas de Clean Architecture, build moderno com Gradle (Kotlin DSL, Composite Builds), segurança por padrão e resiliência.
+Welcome to the **Golden Path Project Template** (`ms-template-java`). This repository serves as the official technical baseline and architectural blueprint for developing new microservices across the organization. It embodies Clean Architecture best practices, a modern Gradle build system (Kotlin DSL, Composite Builds), security by design, and resilience.
 
-## 📋 Pré-requisitos
+## 📋 Prerequisites
 
-Para rodar e desenvolver neste projeto, as seguintes ferramentas são necessárias no seu ambiente:
+To run and develop in this project, the following tools are required in your environment:
 
-- **[Java 26](https://adoptium.net/)** (via SDKMAN! recomendado)
-- **[Docker](https://docs.docker.com/get-docker/)** e **Docker Compose**
-- **[Task](https://taskfile.dev/)** (Task runner moderno, substituto do `Make`)
-- **[Lefthook](https://github.com/evilmartians/lefthook)** (Para hooks do Git, instalado globalmente via NPM/Homebrew)
-- *Opcionais, porém recomendados:* `trivy`, `semgrep`, `gitleaks`, `k6`, `newman`. (O `Taskfile` faz fallback automático para Docker caso não os encontre nativamente).
+- **[Java 26](https://adoptium.net/)** (recommended via SDKMAN!)
+- **[Docker](https://docs.docker.com/get-docker/)** and **Docker Compose**
+- **[Task](https://taskfile.dev/)** (Modern task runner, replacement for `Make`)
+- **[Lefthook](https://github.com/evilmartians/lefthook)** (For Git hooks, installed globally via NPM/Homebrew)
+- *Optional, but recommended:* `trivy`, `semgrep`, `gitleaks`, `k6`, `newman`. (The `Taskfile` automatically falls back to Docker if they are not installed natively).
 
-## 🏗️ Arquitetura e Estrutura do Projeto
+## 🏗️ Architecture & Project Structure
 
-Este template segue a **Clean Architecture** (Arquitetura Hexagonal / Ports and Adapters) e **Screaming Architecture**, agrupando os pacotes por capacidades de negócio e não por detalhes técnicos.
+This template adheres to **Clean Architecture** (Hexagonal Architecture / Ports and Adapters) and **Screaming Architecture**, grouping packages by business capabilities rather than technical concerns.
 
 ```text
 app/src/main/java/com/example/templatejava/
-├── common/                  # Infraestrutura compartilhada (ex: Exception Handlers, configs de agendamento)
-├── customer/                # Capacidade de Negócio: Cliente
-│   ├── domain/              # Lógica core, 100% puro (sem anotações Spring/Mongo)
-│   ├── application/         # Casos de uso (Use Cases) / Interactors
-│   └── infrastructure/      # Adaptadores (REST, Mongo, Feign, Jobs)
-└── order/                   # Capacidade de Negócio: Pedido
+├── common/                  # Shared infrastructure (e.g., Exception Handlers, scheduling configs)
+├── customer/                # Business Capability: Customer
+│   ├── domain/              # Core logic, 100% pure (no Spring/Mongo annotations)
+│   ├── application/         # Use Cases / Interactors
+│   └── infrastructure/      # Adapters (REST, Mongo, Feign, Jobs)
+└── order/                   # Business Capability: Order
 ```
 
-### Regras de Ouro
-1. **Domínio Puro**: O pacote `domain` não pode conhecer classes de infraestrutura, web ou persistência.
-2. **Value Objects**: Evite *Primitive Obsession* — utilize *records* para modelar conceitos imutáveis.
-3. **In-Memory Fakes**: Prefira usar Fakes (ex: `InMemoryCustomerRepository`) nos testes de `application` para isolamento e velocidade superior aos frameworks de Mock.
+### Golden Rules
+1. **Pure Domain**: The `domain` package must have no knowledge of infrastructure, web, or persistence classes.
+2. **Value Objects**: Avoid *Primitive Obsession* — use *records* to model immutable concepts.
+3. **In-Memory Fakes**: Prefer using Fakes (e.g., `InMemoryCustomerRepository`) in `application` tests for isolation and superior execution speed compared to mocking frameworks.
 
-## 🚀 Como Executar Localmente
+## 🚀 Running Locally
 
-Utilizamos o **Task** para padronizar todos os comandos comuns no ciclo de vida do projeto. Para ver a lista completa de comandos, basta rodar:
+We use **Task** to standardize all common commands throughout the project lifecycle. To view the complete list of available tasks, run:
 
 ```bash
 task
 ```
 
-### Perfis de Execução (`api` vs `scheduling`)
+### Execution Profiles (`api` vs `scheduling`)
 
-A aplicação é projetada para rodar em contextos isolados para escalabilidade horizontal otimizada:
-- **`api`**: Sobe o servidor web e expõe os endpoints HTTP e REST. (Profile Spring: `api`)
-- **`scheduling`**: Executa jobs assíncronos e processos em background (ex: sincronização de clientes). (Profile Spring: `scheduling`)
+The application is designed to run in isolated runtime contexts for optimized horizontal scalability:
+- **`api`**: Boots the web server and exposes HTTP and REST endpoints. (Spring Profile: `api`)
+- **`scheduling`**: Executes asynchronous jobs and background workers (e.g., customer synchronization). (Spring Profile: `scheduling`)
 
-### Inicializando a Aplicação
+### Starting the Application
 
-Suba a infraestrutura base (MongoDB e dependências core) e em seguida a aplicação.
+Spin up the base infrastructure (MongoDB and core dependencies), followed by the application.
 
 ```bash
-# Sobe banco de dados e dependências core
+# Start database and core dependencies
 task infra:core
 
-# Roda o módulo web (API)
+# Run the web module (API)
 task run:api
 
-# Roda os workers (Scheduling)
+# Run the workers (Scheduling)
 task run:scheduling
 ```
 
-Ou, via Docker Compose:
+Or, via Docker Compose:
 ```bash
-# Levanta os containers da API e Scheduling
+# Spin up both API and Scheduling containers
 task docker:app:up
 ```
 
-## 🛠️ Comandos do Taskfile
+## 🛠️ Taskfile Commands
 
-Aqui estão os principais comandos disponíveis no `Taskfile.yaml`:
+Here are the primary commands available in `Taskfile.yaml`:
 
-### Build & Testes
-- `task check`: Roda toda a suíte de verificação (unitários, integração com Testcontainers, coverage Jacoco, check de formatação Spotless e ArchUnit).
-- `task build`: Compila a aplicação gerando o JAR.
-- `task test:unit`: Executa testes unitários rápidos.
-- `task test:integration`: Executa testes de integração (sobe banco localmente via Testcontainers).
-- `task test:mutation`: Executa testes de mutação com Pitest para garantir a resiliência das validações de domínio.
+### Build & Tests
+- `task check`: Runs the full verification suite (unit tests, integration tests with Testcontainers, JaCoCo coverage, Spotless formatting check, and ArchUnit).
+- `task build`: Compiles the application and packages the JAR.
+- `task test:unit`: Executes fast unit tests.
+- `task test:integration`: Executes integration tests (spins up local database via Testcontainers).
+- `task test:mutation`: Runs mutation tests with Pitest to ensure the resilience of domain validation logic.
 
-### Segurança (SCA e SAST)
-- `task security:gitleaks`: Verifica credenciais e secrets expostos no código.
-- `task security:trivy`: Escaneia o código e a imagem Docker em busca de vulnerabilidades (CVEs) em dependências.
-- `task security:sast`: Varredura de segurança com Semgrep contra o OWASP Top 10.
-- `task security:sbom`: Gera o Software Bill of Materials (CycloneDX).
+### Security (SCA and SAST)
+- `task security:gitleaks`: Scans the repository for leaked secrets and credentials.
+- `task security:trivy`: Scans source code and container images for dependency vulnerabilities (CVEs).
+- `task security:sast`: SAST security scan with Semgrep against the OWASP Top 10.
+- `task security:sbom`: Generates the Software Bill of Materials (CycloneDX).
 
-### Testes de Carga e API
-- `task newman`: Executa testes de API automatizados com Newman/Postman.
-- `task k6:smoke` / `k6:load` / `k6:stress`: Bateria de testes de performance usando k6.
+### Load & API Testing
+- `task newman`: Executes automated API tests with Newman/Postman.
+- `task k6:smoke` / `k6:load` / `k6:stress`: Performance and load testing suite powered by k6.
 
-### Migrações de Banco de Dados (migrate-mongo)
-- `task migrate:status`: Exibe o status das migrações (aplicadas vs pendentes).
-- `task migrate:up`: Aplica todas as migrações pendentes no MongoDB.
-- `task migrate:down`: Reverte a última migração aplicada.
-- `task migrate:create -- <nome>`: Cria um novo script de migração versionado em `migrate-mongo/migrations/`.
-- Mais detalhes e opções de execução via Docker em [`migrate-mongo/README.md`](migrate-mongo/README.md).
+### Database Migrations (migrate-mongo)
+- `task migrate:status`: Displays migration status (applied vs pending).
+- `task migrate:up`: Applies all pending migrations to MongoDB.
+- `task migrate:down`: Rolls back the last applied migration.
+- `task migrate:create -- <name>`: Creates a new timestamped migration script in `migrate-mongo/migrations/`.
+- For more details and Docker execution options, see [`migrate-mongo/README.md`](migrate-mongo/README.md).
 
-## 🤝 Submissão de PRs e Contribuição
+## 🤝 Submitting PRs & Contributing
 
-Garantimos a qualidade desde o commit utilizando **Lefthook** e **Commitlint**.
+Quality is enforced starting at commit time using **Lefthook** and **Commitlint**.
 
-1. **Configure o repositório na primeira vez**:
+1. **Set up the repository for the first time**:
    ```bash
    task setup:hooks
    ```
-2. Crie uma nova branch a partir de `main`.
-3. Certifique-se de que o código segue o *Spotless Format* e os testes de arquitetura passam rodando `task check`.
-4. Os commits devem seguir a convenção de **Conventional Commits** (ex: `feat: add order creation endpoint`, `fix: validate email formatting`).
-5. As regras do Lefthook farão o lint da mensagem do commit, analisarão possíveis vazamentos de secrets e checarão formatação antes que você possa criar o commit com sucesso.
+2. Create a new branch from `main`.
+3. Ensure code conforms to *Spotless Format* and architecture rules pass by running `task check`.
+4. Commit messages must follow the **Conventional Commits** standard (e.g., `feat: add order creation endpoint`, `fix: validate email formatting`).
+5. Lefthook Git hooks will lint commit messages, analyze potential secret leaks, and verify formatting before a commit can be created successfully.
 
 ---
 
-*Nota: Um mecanismo oficial de Scaffolding para renomear este repositório base para seu novo microsserviço estará disponível em breve. Siga as instruções deste README para desenvolvimento local.*
+*Note: An official Scaffolding mechanism to rename this baseline repository for your new microservice will be available soon. Follow the instructions in this README for local development.*
