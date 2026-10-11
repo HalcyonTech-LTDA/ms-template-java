@@ -28,10 +28,11 @@ RUN --mount=type=cache,target=/root/.gradle ./gradlew :app:bootJar -x test --no-
 # ==============================================================================
 FROM eclipse-temurin:26-jre AS runner
 
-# Install curl for container health checks and apply security updates
+# Install curl for container health checks, apply security updates, and remove unused Canonical Pebble binary
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y --no-install-recommends curl && \
+    rm -f /usr/bin/pebble && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
